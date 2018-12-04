@@ -1,4 +1,5 @@
 #include <mq3.h>
+#include <EEPROM.h>
 
 const int sensorIn = A0;
 const int SpeakerOut = A1;
@@ -88,6 +89,23 @@ void HighLevel() {
   Kolenda();
 }
 
+unsigned long workTimeMinutes = 0;
+// writes amount of minutes to EEPROM addr 100 (writes every minute)
+void WriteRunningTime() {
+  unsigned long currMin = millis() / 60000;
+
+  //Serial.print("Current value: ");
+  //Serial.println(currMin);
+
+  if (currMin > workTimeMinutes) {
+    workTimeMinutes = currMin;
+    EEPROM.put(100, workTimeMinutes);
+    //EEPROM.get(100, currMin);
+    //Serial.print("Written value: ");
+    //Serial.println(currMin);
+  } 
+}
+
 MQ3 mq3;
 
 void setup() {
@@ -103,6 +121,13 @@ void setup() {
   Serial.begin(9600);
   SetOff();
   digitalWrite(ledBlue, LOW);
+
+  // On start, backup value from 100 to 200
+  unsigned long backupTime = 0;
+  EEPROM.get(100, backupTime);
+  EEPROM.put(200, backupTime);
+  Serial.print("Value stored in 100: ");
+  Serial.println(backupTime);
 }
 
 float prevVolt = 0;
@@ -122,11 +147,13 @@ void loop() {
     SetOff();
   }
   prevVolt = volt;
+
+  WriteRunningTime();
   
-  Serial.println(mq3.getR0());
+  /*Serial.println(mq3.getR0());
   Serial.print("voltage: ");
   Serial.print(volt);
   Serial.print(", alcohol: ");
-  Serial.println(alc, 4);
+  Serial.println(alc, 4);*/
   delay(1000);
 }
