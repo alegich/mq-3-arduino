@@ -1,5 +1,5 @@
 #include <mq3.h>
-#include <EEPROM.h>
+//#include <EEPROM.h>
 
 const int sensorIn = A0;
 const int SpeakerOut = A1;
@@ -94,15 +94,9 @@ unsigned long workTimeMinutes = 0;
 void WriteRunningTime() {
   unsigned long currMin = millis() / 60000;
 
-  //Serial.print("Current value: ");
-  //Serial.println(currMin);
-
   if (currMin > workTimeMinutes) {
     workTimeMinutes = currMin;
-    EEPROM.put(100, workTimeMinutes);
-    //EEPROM.get(100, currMin);
-    //Serial.print("Written value: ");
-    //Serial.println(currMin);
+    //EEPROM.put(100, workTimeMinutes);
   } 
 }
 
@@ -123,11 +117,11 @@ void setup() {
   digitalWrite(ledBlue, LOW);
 
   // On start, backup value from 100 to 200
-  unsigned long backupTime = 0;
-  EEPROM.get(100, backupTime);
-  EEPROM.put(200, backupTime);
-  Serial.print("Value stored in 100: ");
-  Serial.println(backupTime);
+  //unsigned long backupTime = 0;
+  //EEPROM.get(100, backupTime);
+  //EEPROM.put(200, backupTime);
+  //Serial.print("Value stored in 100: ");
+  //Serial.println(backupTime);
 }
 
 float prevVolt = 0;
@@ -136,7 +130,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   float volt = getInputVoltage();
   float alc = mq3.GetAlcohol(volt);
-  if (abs(volt - prevVolt) > 0.05) {
+  if ((volt - prevVolt) > 0.05) {
     if (alc >= 0.2) {
       HighLevel();
     } else {
@@ -148,12 +142,12 @@ void loop() {
   }
   prevVolt = volt;
 
-  WriteRunningTime();
+  //WriteRunningTime();
   
-  /*Serial.println(mq3.getR0());
+  Serial.println(mq3.getR0());
   Serial.print("voltage: ");
   Serial.print(volt);
   Serial.print(", alcohol: ");
-  Serial.println(alc, 4);*/
+  Serial.println(alc, 4);
   delay(1000);
 }
